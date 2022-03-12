@@ -28,20 +28,26 @@ var baseURL string = "https://kr.indeed.com/jobs?q=python&limit=50"
 var LastpageURL string = "https://kr.indeed.com/jobs?q=python&limit=50&start=9999"
 
 func main(){
+	channel := make(chan []extractedJob)
 	jobs := []extractedJob{}
 	totalPages :=	getPages()
 
 	
 	for i := 0;i<totalPages; i++{
-		extractedJobs := getPage(i)
-		jobs = append(jobs, extractedJobs...)
+		go getPage(i, channel)
 	}
+	
+	for i := 0;i<totalPages; i++{
+	extractedJobs := <-channel
+	jobs = append(jobs, extractedJobs...)
+	}
+
 	writeJobs(jobs)
 	fmt.Println("Done, extracted", len(jobs))
 
 }
 
-func getPage(page int) []extractedJob{
+func getPage(page int, mainChannel chan<- []extractedJob) {
 	channel := make(chan extractedJob)
 
 	jobs := []extractedJob{}
@@ -69,7 +75,7 @@ func getPage(page int) []extractedJob{
 		jobs = append(jobs, job)
 	}
 
-	return jobs
+	mainChannel <- jobs
 }
 
 func extractJob(card *goquery.Selection, channel chan<- extractedJob) {
