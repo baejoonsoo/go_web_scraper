@@ -69,7 +69,6 @@ func extractJob(card *goquery.Selection) extractedJob{
 	salary := cleanString(card.Find(".salary-snippet").Text())
 	summary := cleanString(card.Find(".job-snippet").Text())
 	
-	// fmt.Println(id, title, location, salary, summary)
 	return extractedJob{
 		id: id,
 		title: title,
@@ -104,32 +103,9 @@ func checkErr(err error){
 		log.Fatalln(err)
 	}
 }
-	
-	func checkStatusCode(StatusCode int){
-		if StatusCode != 200{
+
+func checkStatusCode(StatusCode int){
+	if StatusCode != 200{
 		log.Fatalln("Request failed with Status : ", StatusCode)
 	}
 }
-
-/*
-func getPages() int {
-pages := 0
-res, err := http.Get(baseURL)
-
-checkErr(err)
-checkStatusCode(res.StatusCode)
-
-defer res.Body.Close()
-
-doc,err := goquery.NewDocumentFromReader(res.Body)
-
-checkErr(err)
-
-// fmt.Println(doc)
-doc.Find(".pagination").Each(func(i int, s *goquery.Selection) {
-	pages = s.Find("a").Length()
-})
-
-return pages	
-}
-*/
