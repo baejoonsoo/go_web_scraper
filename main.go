@@ -12,7 +12,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-// 크롤링 여러번 계속하면 차단 먹음...
+// 크롤링 짧은 시간내에 여러번 계속하면 차단 먹음...
 // 조심하기...
 
 type extractedJob struct {
@@ -38,26 +38,6 @@ func main(){
 	}
 	writeJobs(jobs)
 	fmt.Println("Done, extracted", len(jobs))
-
-}
-
-func writeJobs(jobs []extractedJob){
-	file, err := os.Create("jobs.csv")
-	checkErr(err)
-
-	w := csv.NewWriter(file)
-	defer w.Flush()
-
-	headers := []string{"Link", "Title", "Location", "Salary", "Summary"}
-
-	wErr := w.Write(headers)
-	checkErr(wErr)
-
-	for _, job := range jobs{
-		jobSlice := []string{"https://kr.indeed.com/viewjob?jk="+job.id, job.title, job.location, job.salary, job.summary}
-		jwErr := w.Write(jobSlice)
-		checkErr(jwErr)
-	}
 
 }
 
@@ -126,6 +106,25 @@ func getPages() int {
 		pages, err = strconv.Atoi(s.Find("b").Text())
 	})
 	return pages
+}
+
+func writeJobs(jobs []extractedJob){
+	file, err := os.Create("jobs.csv")
+	checkErr(err)
+
+	w := csv.NewWriter(file)
+	defer w.Flush()
+
+	headers := []string{"Link", "Title", "Location", "Salary", "Summary"}
+
+	wErr := w.Write(headers)
+	checkErr(wErr)
+
+	for _, job := range jobs{
+		jobSlice := []string{"https://kr.indeed.com/viewjob?jk="+job.id, job.title, job.location, job.salary, job.summary}
+		jwErr := w.Write(jobSlice)
+		checkErr(jwErr)
+	}
 }
 
 func checkErr(err error){
