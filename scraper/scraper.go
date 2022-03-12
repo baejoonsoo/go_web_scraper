@@ -23,22 +23,18 @@ type extractedJob struct {
 	summary string
 }
 
-var baseURL string = "https://kr.indeed.com/jobs?q=go&limit=50"
-var LastpageURL string = "https://kr.indeed.com/jobs?q=go&limit=50&start=9999"
-
-
 // Scrape indeed by a term
 func Scrape(term string){
-	baseURL = "https://kr.indeed.com/jobs?q="+term+"&limit=50"
-	LastpageURL = "https://kr.indeed.com/jobs?q="+term+"&limit=50&start=9999"
+	baseURL := "https://kr.indeed.com/jobs?q="+term+"&limit=50"
+	LastpageURL := "https://kr.indeed.com/jobs?q="+term+"&limit=50&start=9999"
 
 	channel := make(chan []extractedJob)
 	jobs := []extractedJob{}
-	totalPages :=	getPages()
+	totalPages :=	getPages(LastpageURL)
 
 	
 	for i := 0;i<totalPages; i++{
-		go getPage(i, channel)
+		go getPage(i, baseURL, channel)
 	}
 	
 	for i := 0;i<totalPages; i++{
@@ -51,7 +47,7 @@ func Scrape(term string){
 
 }
 
-func getPage(page int, mainChannel chan<- []extractedJob) {
+func getPage(page int, baseURL string, mainChannel chan<- []extractedJob) {
 	channel := make(chan extractedJob)
 
 	jobs := []extractedJob{}
@@ -102,7 +98,7 @@ func cleanString(str string) string{
 	return strings.Join(strings.Fields(strings.TrimSpace(str))," ")
 }
 
-func getPages() int {
+func getPages(LastpageURL string) int {
 	pages := 0
 	res, err := http.Get(LastpageURL)
 	checkErr(err)
