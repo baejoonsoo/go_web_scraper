@@ -36,8 +36,9 @@ func main(){
 		extractedJobs := getPage(i)
 		jobs = append(jobs, extractedJobs...)
 	}
-	// fmt.Println(jobs)
 	writeJobs(jobs)
+	fmt.Println("Done, extracted", len(jobs))
+
 }
 
 func writeJobs(jobs []extractedJob){
@@ -51,6 +52,12 @@ func writeJobs(jobs []extractedJob){
 
 	wErr := w.Write(headers)
 	checkErr(wErr)
+
+	for _, job := range jobs{
+		jobSlice := []string{"https://kr.indeed.com/viewjob?jk="+job.id, job.title, job.location, job.salary, job.summary}
+		jwErr := w.Write(jobSlice)
+		checkErr(jwErr)
+	}
 
 }
 
