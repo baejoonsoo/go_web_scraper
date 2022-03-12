@@ -10,6 +10,9 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
+// 크롤링 여러번 계속하면 차단 먹음...
+// 조심하기...
+
 type extractedJob struct {
 	id string
 	location string
@@ -35,8 +38,6 @@ func main(){
 }
 
 func getPage(page int) []extractedJob{
-	fmt.Println("getPage")
-
 	jobs := []extractedJob{}
 	pageURL := baseURL + "&start="+ strconv.Itoa(page*50)
 	fmt.Println("Requesting",pageURL)
@@ -62,7 +63,6 @@ func getPage(page int) []extractedJob{
 }
 
 func extractJob(card *goquery.Selection) extractedJob{
-	fmt.Println("extractJob")
 	id,_ := card.Attr("data-jk")		
 	title:= cleanString(card.Find(".jobTitle>span").Text())
 	location := cleanString(card.Find(".companyLocation").Text())
