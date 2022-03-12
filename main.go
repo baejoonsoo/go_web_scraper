@@ -62,6 +62,8 @@ func writeJobs(jobs []extractedJob){
 }
 
 func getPage(page int) []extractedJob{
+	channel := make(chan extractedJob)
+
 	jobs := []extractedJob{}
 	pageURL := baseURL + "&start="+ strconv.Itoa(page*50)
 	fmt.Println("Requesting",pageURL)
@@ -79,21 +81,25 @@ func getPage(page int) []extractedJob{
 	searchCards := doc.Find(".tapItem")
 
 	searchCards.Each(func(i int, card *goquery.Selection) {
-		job := extractJob(card)
-		jobs = append(jobs, job)
+		go extractJob(card, channel)
 	})
+
+	for i:=0; i<searchCards.Length(); i++{
+		job := <-channel
+		jobs = append(jobs, job)
+	}
 
 	return jobs
 }
 
-func extractJob(card *goquery.Selection) extractedJob{
+func extractJob(card *goquery.Selection, channel chan<- extractedJob) {
 	id,_ := card.Attr("data-jk")		
 	title:= cleanString(card.Find(".jobTitle>span").Text())
 	location := cleanString(card.Find(".companyLocation").Text())
 	salary := cleanString(card.Find(".salary-snippet").Text())
 	summary := cleanString(card.Find(".job-snippet").Text())
 	
-	return extractedJob{
+	channel <- extractedJob{
 		id: id,
 		title: title,
 		location: location,
