@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"strings"
 
 	"github.com/PuerkitoBio/goquery"
+	cleanstring "github.com/baejoonsoo/webScraper/cleanString"
 )
 
 // 크롤링 짧은 시간내에 여러번 계속하면 차단 먹음...
@@ -80,10 +80,10 @@ func getPage(page int, baseURL string, mainChannel chan<- []extractedJob) {
 
 func extractJob(card *goquery.Selection, channel chan<- extractedJob) {
 	id,_ := card.Attr("data-jk")		
-	title:= CleanString(card.Find(".jobTitle>span").Text())
-	location := CleanString(card.Find(".companyLocation").Text())
-	salary := CleanString(card.Find(".salary-snippet").Text())
-	summary := CleanString(card.Find(".job-snippet").Text())
+	title:= cleanstring.CleanString(card.Find(".jobTitle>span").Text())
+	location := cleanstring.CleanString(card.Find(".companyLocation").Text())
+	salary := cleanstring.CleanString(card.Find(".salary-snippet").Text())
+	summary := cleanstring.CleanString(card.Find(".job-snippet").Text())
 	
 	channel <- extractedJob{
 		id: id,
@@ -95,10 +95,7 @@ func extractJob(card *goquery.Selection, channel chan<- extractedJob) {
 }
 
 
-// CleanString cleans a string
-func CleanString(str string) string{
-	return strings.Join(strings.Fields(strings.TrimSpace(str))," ")
-}
+
 
 func getPages(LastpageURL string) int {
 	pages := 0

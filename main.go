@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/baejoonsoo/webScraper/scraper"
+	cleanstring "github.com/baejoonsoo/webScraper/cleanString"
 	"github.com/labstack/echo"
 )
 
@@ -13,7 +13,7 @@ func handleHome(c echo.Context) error{
 }
 
 func handleScrape(c echo.Context) error{
-	term := strings.ToLower(scraper.CleanString(c.FormValue("term")))
+	term := strings.ToLower(cleanstring.CleanString(c.FormValue("term")))
 	fmt.Println(term)
 	return nil
 }
